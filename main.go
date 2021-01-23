@@ -4,42 +4,57 @@ package main
 
 import (
 	"fmt"
+	"io/ioutil"
 	"net/http"
 	"net/url"
+	"os"
+	"sync"
 	"time"
 )
 
 func main() {
-	//"https://portswigger.net/burp/releases/download?product=pro&version=2020.11.3&type=jar"
+	var wg sync.WaitGroup
+
+	// api := "https://portswigger.net/burp/releases/download?product=pro&version=2020.11.3&type=jar"
 	api := "https://portswigger.net/burp/releases/download?product=pro&type=windowsx64&version="
-	for y := 2019; y <= time.Now().Year(); y++ {
-		for m := 0; m <= int(time.Now().Month()); m++ {
-			for d := 0; d <= 31; d++ {
-				apiurl := api + string(y) + "." + string(m) + "." + string(d)
-				res, err := rescode(apiurl)
-				if err != nil && res == 200 {
-					fmt.Printf(apiurl)
-				}
+	for y := 2020; y <= time.Now().Year(); y++ {
+		for m := 1; m <= 12; m++ {
+			for d := 1; d <= 3; d++ {
+				ver := fmt.Sprint(y) + "." + fmt.Sprint(m) + "." + fmt.Sprint(d)
+				// apiurl = api + "2020.11.3"
+				// fmt.Printf("testing %s\n", api)
+				wg.Add(1)
+				go rescode(api, ver, &wg)
+
 			}
 		}
 	}
+	wg.Wait()
+	os.Exit(0)
 }
 
-func rescode(apiurl string) (int, error) {
-	u, _ := url.Parse(apiurl)
+func rescode(api string, ver string, wg *sync.WaitGroup) {
+	defer wg.Done()
+	timeout := time.Duration(3 * time.Second)
+	client := http.Client{
+		Timeout: timeout,
+	}
+	u, _ := url.Parse(api + ver)
 	q := u.Query()
 	u.RawQuery = q.Encode()
-	res, err := http.Get(u.String())
+	resp, err := client.Get(u.String())
 	if err != nil {
-		fmt.Println("0")
-		return 0, err
+		return
 	}
-	resCode := res.StatusCode
-	res.Body.Close()
+
+	_, err = ioutil.ReadAll(resp.Body)
 	if err != nil {
-		fmt.Println("0")
-		return 0, err
+		fmt.Println("Found a version!", api, ver)
+		// fmt.Println("ioutil.ReadAll err=", err)
+		return
 	}
-	fmt.Printf("%d\r\n", resCode)
-	return resCode, nil
+	// fmt.Println(len(bytes))
+	resp.Body.Close()
+	// fmt.Printf("%s,%d\r\n", apiurl, resCode)
+	return
 }
