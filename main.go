@@ -16,6 +16,10 @@ func main() {
 	var wg sync.WaitGroup
 
 	api := "https://portswigger.net/burp/releases/download?product=pro&type=windowsx64&version="
+	fmt.Printf("\033[1;34m A Burpsuite Update Finder BY-ZYA\n \033[0m")
+	fmt.Printf("\033[1;34m   _____             _____     _ _          _____       _     _          _____ _       _         \n   | __  |_ _ ___ ___|   __|_ _|_| |_ ___   |  |  |___ _| |___| |_ ___   |   __|_|___ _| |___ ___ \n   | __ -| | |  _| . |__   | | | |  _| -_|  |  |  | . | . | .'|  _| -_|  |   __| |   | . | -_|  _|\n   |_____|___|_| |  _|_____|___|_|_| |___|  |_____|  _|___|__,|_| |___|  |__|  |_|_|_|___|___|_|  \n				 |_|                              |_|                                             \n\033[0m")
+	fmt.Printf("\033[1;30m [-]Finding...\n \033[0m")
+
 	for y := 2020; y <= time.Now().Year(); y++ {
 		for m := 1; m <= 12; m++ {
 			for d := 1; d <= 3; d++ {
@@ -27,6 +31,8 @@ func main() {
 		}
 	}
 	wg.Wait()
+	fmt.Printf("\033[1;34m [+]Done! \033[0m")
+	time.Sleep(1 * time.Minute)
 	os.Exit(0)
 }
 
@@ -46,7 +52,7 @@ func rescode(api string, ver string, wg *sync.WaitGroup) {
 
 	_, err = ioutil.ReadAll(resp.Body)
 	if err != nil {
-		fmt.Println("Found a version!", api+ver)
+		fmt.Println("\033[1;32m [+]Found a version! 033[0m", api+ver)
 		return
 	}
 	resp.Body.Close()
