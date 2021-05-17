@@ -20,16 +20,20 @@ func main() {
 	fmt.Printf("   _____             _____     _ _          _____       _     _          _____ _       _         \n   | __  |_ _ ___ ___|   __|_ _|_| |_ ___   |  |  |___ _| |___| |_ ___   |   __|_|___ _| |___ ___ \n   | __ -| | |  _| . |__   | | | |  _| -_|  |  |  | . | . | .'|  _| -_|  |   __| |   | . | -_|  _|\n   |_____|___|_| |  _|_____|___|_|_| |___|  |_____|  _|___|__,|_| |___|  |__|  |_|_|_|___|___|_|  \n				 |_|                              |_|                                             \n")
 	fmt.Printf("[-]Finding...\n")
 
-	for y := 2020; y <= time.Now().Year(); y++ {
-		for m := 1; m <= 12; m++ {
-			for d := 1; d <= 3; d++ {
-				ver := fmt.Sprint(y) + "." + fmt.Sprint(m) + "." + fmt.Sprint(d)
-				wg.Add(1)
-				go rescode(api, ver, &wg)
+	y := time.Now().Year()
+	Maxmonth := 12
+	if y == time.Now().Year() {
+		Maxmonth = int(time.Now().Month())
+	}
+	for m := 1; m <= Maxmonth; m++ {
+		for d := 1; d <= 3; d++ {
+			ver := fmt.Sprint(y) + "." + fmt.Sprint(m) + "." + fmt.Sprint(d)
+			wg.Add(1)
+			go rescode(api, ver, &wg)
 
-			}
 		}
 	}
+
 	wg.Wait()
 	fmt.Printf("[+]Done!")
 	time.Sleep(1 * time.Minute)
@@ -56,5 +60,4 @@ func rescode(api string, ver string, wg *sync.WaitGroup) {
 		return
 	}
 	resp.Body.Close()
-	return
 }
