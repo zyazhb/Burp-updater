@@ -42,7 +42,7 @@ func main() {
 
 func rescode(api string, ver string, wg *sync.WaitGroup) {
 	defer wg.Done()
-	timeout := time.Duration(3 * time.Second)
+	timeout := time.Duration(5 * time.Second)
 	client := http.Client{
 		Timeout: timeout,
 	}
