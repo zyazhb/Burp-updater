@@ -8,9 +8,12 @@ import (
 	"net/http"
 	"net/url"
 	"os"
+	"sort"
 	"sync"
 	"time"
 )
+
+var versionlist []string
 
 func main() {
 	var wg sync.WaitGroup
@@ -35,7 +38,13 @@ func main() {
 	}
 
 	wg.Wait()
-	fmt.Printf("[+]Done!")
+	fmt.Printf("[+]Done!\n")
+
+	sort.Strings(versionlist)
+	for _, v := range versionlist {
+		fmt.Println("[+]Found a version!", v)
+	}
+
 	time.Sleep(1 * time.Minute)
 	os.Exit(0)
 }
@@ -56,7 +65,8 @@ func rescode(api string, ver string, wg *sync.WaitGroup) {
 
 	_, err = ioutil.ReadAll(resp.Body)
 	if err != nil {
-		fmt.Println("[+]Found a version!", api+ver)
+		// fmt.Println("[+]Found a version!", api+ver)
+		versionlist = append(versionlist, api+ver)
 		return
 	}
 	resp.Body.Close()
