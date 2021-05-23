@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"net/url"
 	"os"
+	"os/exec"
 	"sort"
 	"sync"
 	"time"
@@ -19,9 +20,16 @@ func main() {
 	var wg sync.WaitGroup
 
 	api := "https://portswigger.net/burp/releases/download?product=pro&type=windowsx64&version="
-	fmt.Printf("A Burpsuite Update Finder BY-ZYA\n ")
+	fmt.Println("A Burpsuite Update Finder BY-ZYA")
 	fmt.Printf("   _____             _____     _ _          _____       _     _          _____ _       _         \n   | __  |_ _ ___ ___|   __|_ _|_| |_ ___   |  |  |___ _| |___| |_ ___   |   __|_|___ _| |___ ___ \n   | __ -| | |  _| . |__   | | | |  _| -_|  |  |  | . | . | .'|  _| -_|  |   __| |   | . | -_|  _|\n   |_____|___|_| |  _|_____|___|_|_| |___|  |_____|  _|___|__,|_| |___|  |__|  |_|_|_|___|___|_|  \n				 |_|                              |_|                                             \n")
-	fmt.Printf("[-]Finding...\n")
+	CurrentVersion, err := GetCurrentVersion()
+	if err != nil {
+		fmt.Println("Can not find BurpSuitePro.exe in this dir!" + err.Error())
+	} else {
+		fmt.Println("Your Current Version is " + CurrentVersion)
+
+	}
+	fmt.Println("[-]Finding...")
 
 	y := time.Now().Year()
 	Maxmonth := 12
@@ -70,4 +78,23 @@ func rescode(api string, ver string, wg *sync.WaitGroup) {
 		return
 	}
 	resp.Body.Close()
+}
+
+func GetCurrentVersion() (string, error) {
+	cmd := exec.Command("powershell", "-c", "(Get-Item -path './BurpSuitePro.exe').VersionInfo.ProductVersion")
+	stdout, err := cmd.StdoutPipe()
+	if err != nil {
+		return "", err
+	}
+	defer stdout.Close()
+	if err := cmd.Start(); err != nil {
+		return "", err
+	}
+	if opBytes, err := ioutil.ReadAll(stdout); err != nil {
+		return "", err
+
+	} else {
+		return string(opBytes), nil
+	}
+
 }
