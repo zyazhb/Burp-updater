@@ -36,12 +36,11 @@ func main() {
 	if y == time.Now().Year() {
 		Maxmonth = int(time.Now().Month())
 	}
-	for m := 1; m <= Maxmonth; m++ {
-		for d := 1; d <= 3; d++ {
+	for m := Maxmonth - 3; m <= Maxmonth; m++ {
+		for d := 1; d <= 5; d++ {
 			ver := fmt.Sprint(y) + "." + fmt.Sprint(m) + "." + fmt.Sprint(d)
 			wg.Add(1)
 			go rescode(api, ver, &wg)
-
 		}
 	}
 
@@ -96,5 +95,4 @@ func GetCurrentVersion() (string, error) {
 	} else {
 		return string(opBytes), nil
 	}
-
 }
